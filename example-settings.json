@@ -1,0 +1,9 @@
+{
+	"cline": {
+		"overwriteState": {
+			"openRouterApiKey": "xyz",
+			"apiProvider": "openrouter",
+			"openRouterModelId": "anthropic/claude-3.5-sonnet"
+		}
+	}
+}
