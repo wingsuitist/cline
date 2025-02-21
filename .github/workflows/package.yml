@@ -49,12 +49,11 @@ jobs:
             - name: Install vsce
               run: npm install -g vsce
 
-            - name: Build and Package Extension
-              run: |
-                  # Run the full package script which includes build:webview, check-types, and lint
-                  npm run package
-                  # Create the VSIX package
-                  vsce package --out "cline-latest.vsix"
+            - name: Build Extension
+              run: npm run build:webview && npm run check-types && npm run lint && node esbuild.js --production
+
+            - name: Package Extension
+              run: vsce package --out "cline-latest.vsix"
 
             - name: Upload VSIX as Artifact
               uses: actions/upload-artifact@v4
