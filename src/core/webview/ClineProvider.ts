@@ -175,11 +175,11 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 		return findLast(Array.from(this.activeInstances), (instance) => instance.view?.visible === true)
 	}
 
-	resolveWebviewView(
+	async resolveWebviewView(
 		webviewView: vscode.WebviewView | vscode.WebviewPanel,
 		//context: vscode.WebviewViewResolveContext<unknown>, used to recreate a deallocated webview, but we don't need this since we use retainContextWhenHidden
 		//token: vscode.CancellationToken
-	): void | Thenable<void> {
+	): Promise<void> {
 		this.outputChannel.appendLine("Resolving webview view")
 		this.view = webviewView
 
@@ -189,6 +189,18 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 			localResourceRoots: [this.context.extensionUri],
 		}
 		webviewView.webview.html = this.getHtmlContent(webviewView.webview)
+
+		// Read overwriteState from settings.json
+		const config = vscode.workspace.getConfiguration("cline")
+		const overwriteState = config.get<any>("overwriteState")
+
+		if (overwriteState && typeof overwriteState === "object") {
+			for (const key in overwriteState) {
+				if (overwriteState.hasOwnProperty(key)) {
+					await this.updateGlobalState(key as GlobalStateKey, overwriteState[key])
+				}
+			}
+		}
 
 		// Sets up an event listener to listen for messages passed from the webview view context
 		// and executes code based on the message that is received
