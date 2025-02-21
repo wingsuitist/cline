@@ -50,6 +50,8 @@ jobs:
               run: npm install -g vsce
 
             - name: Package Extension
+              env:
+                  CI: false
               run: vsce package --out "cline-latest.vsix"
 
             - name: Upload VSIX as Artifact
