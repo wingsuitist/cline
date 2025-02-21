@@ -50,7 +50,11 @@ jobs:
               run: npm install -g vsce
 
             - name: Build Extension
-              run: npm run build:webview && npm run check-types && npm run lint && node esbuild.js --production
+              run: |
+                  npm run build:webview
+                  npm run check-types
+                  npm run lint  
+                  node esbuild.js --production
 
             - name: Package Extension
               run: vsce package --out "cline-latest.vsix"
