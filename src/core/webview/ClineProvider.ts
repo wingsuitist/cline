@@ -190,10 +190,6 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 		}
 		webviewView.webview.html = this.getHtmlContent(webviewView.webview)
 
-		// Sets up an event listener to listen for messages passed from the webview view context
-		// and executes code based on the message that is received
-		this.setWebviewMessageListener(webviewView.webview)
-
 		// Read and apply overwriteState from settings.json
 		const config = vscode.workspace.getConfiguration("cline")
 		const overwriteState = config.get<any>("overwriteState")
@@ -210,6 +206,10 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 				}
 			}
 		}
+
+		// Sets up an event listener to listen for messages passed from the webview view context
+		// and executes code based on the message that is received
+		this.setWebviewMessageListener(webviewView.webview)
 
 		// Logs show up in bottom panel > Debug Console
 		//console.log("registering listener")
