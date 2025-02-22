@@ -59,3 +59,21 @@ jobs:
               with:
                   name: cline-latest
                   path: cline-latest.vsix
+
+            # This will make the VSIX available at:
+            # https://github.com/wingsuitist/cline/releases/download/latest/cline-latest.vsix
+            - name: Upload VSIX to Release
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  # Delete existing release and tag
+                  gh release delete latest --yes || true
+                  git tag -d latest || true
+                  git push origin :refs/tags/latest || true
+
+                  # Create new release with VSIX as asset
+                  gh release create latest \
+                    --title "Latest Build" \
+                    --notes "Latest automated build from branch ${{ github.ref_name }}" \
+                    --target ${{ github.sha }} \
+                    cline-latest.vsix
