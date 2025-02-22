@@ -194,6 +194,23 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 		// and executes code based on the message that is received
 		this.setWebviewMessageListener(webviewView.webview)
 
+		// Read and apply overwriteState from settings.json
+		const config = vscode.workspace.getConfiguration("cline")
+		const overwriteState = config.get<any>("overwriteState")
+
+		if (overwriteState && typeof overwriteState === "object") {
+			for (const key in overwriteState) {
+				if (overwriteState.hasOwnProperty(key)) {
+					// Check if key is a secret key
+					if (this.isSecretKey(key)) {
+						await this.storeSecret(key as SecretKey, overwriteState[key])
+					} else if (this.isGlobalStateKey(key)) {
+						await this.updateGlobalState(key as GlobalStateKey, overwriteState[key])
+					}
+				}
+			}
+		}
+
 		// Logs show up in bottom panel > Debug Console
 		//console.log("registering listener")
 
