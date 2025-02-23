@@ -128,6 +128,11 @@
 		"configuration": {
 			"title": "Cline",
 			"properties": {
+				"cline.overwriteState": {
+					"type": "object",
+					"description": "Override any state properties. See example-settings.json for available options.",
+					"additionalProperties": true
+				},
 				"cline.vsCodeLmModelSelector": {
 					"type": "object",
 					"properties": {
