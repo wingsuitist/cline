@@ -1,9 +1,22 @@
 {
 	"cline": {
 		"overwriteState": {
-			"openRouterApiKey": "xyz",
+			"openRouterApiKey": "YOUR-OPENROUTER-KEY",
 			"apiProvider": "openrouter",
-			"openRouterModelId": "anthropic/claude-3.5-sonnet"
+			"openRouterModelId": "anthropic/claude-3.5-sonnet",
+			"autoApprovalSettings": {
+				"enabled": true,
+				"actions": {
+					"readFiles": true,
+					"editFiles": false,
+					"executeCommands": true,
+					"useBrowser": true,
+					"useMcp": false
+				},
+				"maxRequests": 10,
+				"enableNotifications": false
+			}
+		},
 		}
 	}
 }
