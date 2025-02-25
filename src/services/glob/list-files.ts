@@ -37,6 +37,7 @@ export async function listFiles(dirPath: string, recursive: boolean, limit: numb
 		".*",
 	]
 
+	// overwrite dirsToIgnore using vs code user settings.json
 	const userDirs = vscode.workspace.getConfiguration("cline").get<string[]>("dirsToIgnore.patterns")
 	const dirsToIgnore = (userDirs ?? defaultDirsToIgnore).map((dir: string) => `**/${dir}/**`)
 
