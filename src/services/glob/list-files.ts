@@ -41,7 +41,7 @@ export async function listFiles(dirPath: string, recursive: boolean, limit: numb
 	const userDirs = vscode.workspace.getConfiguration("cline").get<string[]>("dirsToIgnore.patterns")
 	const dirsToIgnore = (userDirs ?? defaultDirsToIgnore).map((dir: string) => `**/${dir}/**`)
 
-	const options = {
+	const options: Options = {
 		cwd: dirPath,
 		dot: true, // do not ignore hidden files/directories
 		absolute: true,
@@ -49,6 +49,7 @@ export async function listFiles(dirPath: string, recursive: boolean, limit: numb
 		gitignore: recursive, // globby ignores any files that are gitignored
 		ignore: recursive ? dirsToIgnore : undefined, // just in case there is no gitignore, we ignore sensible defaults
 		onlyFiles: false, // true by default, false means it will list directories on their own too
+		suppressErrors: true,
 	}
 
 	// * globs all files in one dir, ** globs files in nested directories
