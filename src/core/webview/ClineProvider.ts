@@ -205,6 +205,7 @@ async resolveWebviewView(webviewView: vscode.WebviewView | vscode.WebviewPanel) 
 				? await this.getHMRHtmlContent(webviewView.webview)
 				: this.getHtmlContent(webviewView.webview)
 
+		// <letsboot.ch fork change>
 		// Read and apply overwriteState from settings.json
 		const config = vscode.workspace.getConfiguration("cline")
 		const overwriteState = config.get<any>("overwriteState")
@@ -221,6 +222,7 @@ async resolveWebviewView(webviewView: vscode.WebviewView | vscode.WebviewPanel) 
 				}
 			}
 		}
+		// </letsboot.ch fork change>
 
 		// Sets up an event listener to listen for messages passed from the webview view context
 		// and executes code based on the message that is received
@@ -2212,6 +2214,7 @@ Here is the project's README to help you get started:\n\n${mcpDetails.readmeCont
 		return await this.context.workspaceState.get(key)
 	}
 
+	// <letsboot.ch fork change>
 	private isSecretKey(key: string): key is SecretKey {
 		const secretKeys: SecretKey[] = [
 			"apiKey",
@@ -2275,6 +2278,7 @@ Here is the project's README to help you get started:\n\n${mcpDetails.readmeCont
 		]
 		return globalStateKeys.includes(key as GlobalStateKey)
 	}
+	// </letsboot.ch fork change>
 
 	// secrets
 
