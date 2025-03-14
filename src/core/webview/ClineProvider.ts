@@ -190,7 +190,7 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 		return findLast(Array.from(this.activeInstances), (instance) => instance.view?.visible === true)
 	}
 
-async resolveWebviewView(webviewView: vscode.WebviewView | vscode.WebviewPanel) {
+	async resolveWebviewView(webviewView: vscode.WebviewView | vscode.WebviewPanel) {
 		this.outputChannel.appendLine("Resolving webview view")
 		this.view = webviewView
 
@@ -2231,7 +2231,6 @@ Here is the project's README to help you get started:\n\n${mcpDetails.readmeCont
 			"qwenApiKey",
 			"mistralApiKey",
 			"liteLlmApiKey",
-			"authToken",
 			"authNonce",
 		]
 		return secretKeys.includes(key as SecretKey)
