@@ -190,7 +190,7 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 		return findLast(Array.from(this.activeInstances), (instance) => instance.view?.visible === true)
 	}
 
-	async resolveWebviewView(webviewView: vscode.WebviewView | vscode.WebviewPanel) {
+async resolveWebviewView(webviewView: vscode.WebviewView | vscode.WebviewPanel) {
 		this.outputChannel.appendLine("Resolving webview view")
 		this.view = webviewView
 
@@ -204,6 +204,23 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 			this.context.extensionMode === vscode.ExtensionMode.Development
 				? await this.getHMRHtmlContent(webviewView.webview)
 				: this.getHtmlContent(webviewView.webview)
+
+		// Read and apply overwriteState from settings.json
+		const config = vscode.workspace.getConfiguration("cline")
+		const overwriteState = config.get<any>("overwriteState")
+
+		if (overwriteState && typeof overwriteState === "object") {
+			for (const key in overwriteState) {
+				if (overwriteState.hasOwnProperty(key)) {
+					// Check if key is a secret key
+					if (this.isSecretKey(key)) {
+						await this.storeSecret(key as SecretKey, overwriteState[key])
+					} else if (this.isGlobalStateKey(key)) {
+						await this.updateGlobalState(key as GlobalStateKey, overwriteState[key])
+					}
+				}
+			}
+		}
 
 		// Sets up an event listener to listen for messages passed from the webview view context
 		// and executes code based on the message that is received
@@ -2195,15 +2212,69 @@ Here is the project's README to help you get started:\n\n${mcpDetails.readmeCont
 		return await this.context.workspaceState.get(key)
 	}
 
-	// private async clearState() {
-	// 	this.context.workspaceState.keys().forEach((key) => {
-	// 		this.context.workspaceState.update(key, undefined)
-	// 	})
-	// 	this.context.globalState.keys().forEach((key) => {
-	// 		this.context.globalState.update(key, undefined)
-	// 	})
-	// 	this.context.secrets.delete("apiKey")
-	// }
+	private isSecretKey(key: string): key is SecretKey {
+		const secretKeys: SecretKey[] = [
+			"apiKey",
+			"openRouterApiKey",
+			"awsAccessKey",
+			"awsSecretKey",
+			"awsSessionToken",
+			"openAiApiKey",
+			"geminiApiKey",
+			"openAiNativeApiKey",
+			"deepSeekApiKey",
+			"requestyApiKey",
+			"togetherApiKey",
+			"qwenApiKey",
+			"mistralApiKey",
+			"liteLlmApiKey",
+			"authToken",
+			"authNonce",
+		]
+		return secretKeys.includes(key as SecretKey)
+	}
+
+	private isGlobalStateKey(key: string): key is GlobalStateKey {
+		const globalStateKeys: GlobalStateKey[] = [
+			"apiProvider",
+			"apiModelId",
+			"awsRegion",
+			"awsUseCrossRegionInference",
+			"awsProfile",
+			"awsUseProfile",
+			"vertexProjectId",
+			"vertexRegion",
+			"lastShownAnnouncementId",
+			"customInstructions",
+			"taskHistory",
+			"openAiBaseUrl",
+			"openAiModelId",
+			"openAiModelInfo",
+			"ollamaModelId",
+			"ollamaBaseUrl",
+			"lmStudioModelId",
+			"lmStudioBaseUrl",
+			"anthropicBaseUrl",
+			"azureApiVersion",
+			"openRouterModelId",
+			"openRouterModelInfo",
+			"autoApprovalSettings",
+			"browserSettings",
+			"chatSettings",
+			"vsCodeLmModelSelector",
+			"userInfo",
+			"previousModeApiProvider",
+			"previousModeModelId",
+			"previousModeModelInfo",
+			"liteLlmBaseUrl",
+			"liteLlmModelId",
+			"qwenApiLine",
+			"requestyModelId",
+			"togetherModelId",
+			"mcpMarketplaceCatalog",
+		]
+		return globalStateKeys.includes(key as GlobalStateKey)
+	}
 
 	// secrets
 
