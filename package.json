@@ -212,7 +212,12 @@
 			"properties": {
 				"cline.overwriteState": {
 					"type": "object",
-					"description": "Override any state properties. See example-settings.json for available options.",
+					"description": "[Letsboot Fork] Override non-secret state properties. See example-settings.json for available options.",
+					"additionalProperties": true
+				},
+				"cline.overwriteSecrets": {
+					"type": "object",
+					"description": "[Letsboot Fork] Override secret properties (like API keys). See example-settings.json for available options.",
 					"additionalProperties": true
 				},
 				"cline.dirsToIgnore": {

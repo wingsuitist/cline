@@ -3,6 +3,7 @@
 - Set model and token in user settings.json.
 - Overwrite any of the state and secret using settiongs.json.
 - Overwrite default dirsToIgnore in the user settings.json.
+- Update overwrite state and secrets from UI
 
 ## Install fork:
 

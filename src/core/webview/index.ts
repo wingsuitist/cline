@@ -5,8 +5,8 @@ import { getUri } from "./getUri"
 import { getTheme } from "../../integrations/theme/getTheme"
 import { Controller } from "../controller"
 import { findLast } from "../../shared/array"
-import { SecretKey, GlobalStateKey } from "../storage/state-keys"
-import { storeSecret, updateGlobalState } from "../storage/state"
+// Fork-specific imports
+import { applyStateOverwriteOnStartup, applySecretOverwriteOnStartup } from "../../fork/letsboot/state-override"
 /*
 https://github.com/microsoft/vscode-webview-ui-toolkit-samples/blob/main/default/weather-webview/src/providers/WeatherViewProvider.ts
 https://github.com/KumarVariable/vscode-extension-sidebar-html/blob/master/src/customSidebarViewProvider.ts
@@ -72,23 +72,9 @@ export class WebviewProvider implements vscode.WebviewViewProvider {
 				? await this.getHMRHtmlContent(webviewView.webview)
 				: this.getHtmlContent(webviewView.webview)
 
-		// <letsboot.ch fork change>
-		// Read and apply overwriteState from settings.json
-		const config = vscode.workspace.getConfiguration("cline")
-		const overwriteState = config.get<any>("overwriteState")
-
-		if (overwriteState && typeof overwriteState === "object") {
-			for (const key in overwriteState) {
-				if (overwriteState.hasOwnProperty(key)) {
-					// Check if key is a secret key
-					if (this.isSecretKey(key)) {
-						await storeSecret(this.context, key as SecretKey, overwriteState[key])
-					} else if (this.isGlobalStateKey(key)) {
-						await updateGlobalState(this.context, key as GlobalStateKey, overwriteState[key])
-					}
-				}
-			}
-		}
+		// <letsboot.ch fork change> - Apply initial state/secret overrides from settings.json
+		await applyStateOverwriteOnStartup(this.context)
+		await applySecretOverwriteOnStartup(this.context)
 		// </letsboot.ch fork change>
 
 		// Sets up an event listener to listen for messages passed from the webview view context
@@ -352,83 +338,4 @@ export class WebviewProvider implements vscode.WebviewViewProvider {
 			this.disposables,
 		)
 	}
-
-	// <letsboot.ch fork change>
-	private isSecretKey(key: string): key is SecretKey {
-		const secretKeys: SecretKey[] = [
-			"apiKey",
-			"clineApiKey",
-			"openRouterApiKey",
-			"awsAccessKey",
-			"awsSecretKey",
-			"awsSessionToken",
-			"openAiApiKey",
-			"geminiApiKey",
-			"openAiNativeApiKey",
-			"deepSeekApiKey",
-			"requestyApiKey",
-			"togetherApiKey",
-			"qwenApiKey",
-			"mistralApiKey",
-			"liteLlmApiKey",
-			"authNonce",
-			"asksageApiKey",
-			"xaiApiKey",
-			"sambanovaApiKey",
-		]
-		return secretKeys.includes(key as SecretKey)
-	}
-
-	private isGlobalStateKey(key: string): key is GlobalStateKey {
-		const globalStateKeys: GlobalStateKey[] = [
-			"apiProvider",
-			"apiModelId",
-			"awsRegion",
-			"awsUseCrossRegionInference",
-			"awsBedrockUsePromptCache",
-			"awsBedrockEndpoint",
-			"awsProfile",
-			"awsUseProfile",
-			"vertexProjectId",
-			"vertexRegion",
-			"lastShownAnnouncementId",
-			"customInstructions",
-			"taskHistory",
-			"openAiBaseUrl",
-			"openAiModelId",
-			"openAiModelInfo",
-			"ollamaModelId",
-			"ollamaBaseUrl",
-			"ollamaApiOptionsCtxNum",
-			"lmStudioModelId",
-			"lmStudioBaseUrl",
-			"anthropicBaseUrl",
-			"azureApiVersion",
-			"openRouterModelId",
-			"openRouterModelInfo",
-			"openRouterProviderSorting",
-			"autoApprovalSettings",
-			"browserSettings",
-			"chatSettings",
-			"vsCodeLmModelSelector",
-			"userInfo",
-			"previousModeApiProvider",
-			"previousModeModelId",
-			"previousModeThinkingBudgetTokens",
-			"previousModeVsCodeLmModelSelector",
-			"previousModeModelInfo",
-			"liteLlmBaseUrl",
-			"liteLlmModelId",
-			"qwenApiLine",
-			"requestyModelId",
-			"togetherModelId",
-			"mcpMarketplaceCatalog",
-			"telemetrySetting",
-			"asksageApiUrl",
-			"thinkingBudgetTokens",
-			"planActSeparateModelsSetting",
-		]
-		return globalStateKeys.includes(key as GlobalStateKey)
-	}
-	// </letsboot.ch fork change>
 }

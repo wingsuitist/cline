@@ -5,6 +5,8 @@ import { DEFAULT_AUTO_APPROVAL_SETTINGS } from "../../shared/AutoApprovalSetting
 import { GlobalStateKey, SecretKey } from "./state-keys"
 import { ApiConfiguration, ApiProvider, ModelInfo } from "../../shared/api"
 import { HistoryItem } from "../../shared/HistoryItem"
+// Fork-specific imports
+import { updateOverwrittenState, updateOverwrittenSecret } from "../../fork/letsboot/state-override"
 import { AutoApprovalSettings } from "../../shared/AutoApprovalSettings"
 import { BrowserSettings } from "../../shared/BrowserSettings"
 import { ChatSettings } from "../../shared/ChatSettings"
@@ -19,6 +21,17 @@ import { UserInfo } from "../../shared/UserInfo"
 // global
 
 export async function updateGlobalState(context: vscode.ExtensionContext, key: GlobalStateKey, value: any) {
+	// <letsboot.ch fork change> - Check if state is managed by settings.json
+	const config = vscode.workspace.getConfiguration("cline")
+	const overwriteState = config.get<Record<string, any>>("overwriteState")
+	if (overwriteState && typeof overwriteState === "object") {
+		// If overwriteState exists, delegate update to the fork function which updates settings.json
+		await updateOverwrittenState(context, key, value)
+		return // Prevent updating internal state directly
+	}
+	// </letsboot.ch fork change>
+
+	// Original logic: Update internal VS Code global state
 	await context.globalState.update(key, value)
 }
 
@@ -29,6 +42,18 @@ export async function getGlobalState(context: vscode.ExtensionContext, key: Glob
 // secrets
 
 export async function storeSecret(context: vscode.ExtensionContext, key: SecretKey, value?: string) {
+	// <letsboot.ch fork change> - Check if secret is managed by settings.json
+	const config = vscode.workspace.getConfiguration("cline")
+	const overwriteSecrets = config.get<Record<string, any>>("overwriteSecrets")
+	if (overwriteSecrets && typeof overwriteSecrets === "object") {
+		// If overwriteSecrets exists, delegate update to the fork function which updates settings.json
+		// Pass undefined value to handle deletion if necessary within the fork function
+		await updateOverwrittenSecret(context, key, value)
+		return // Prevent updating internal secret storage directly
+	}
+	// </letsboot.ch fork change>
+
+	// Original logic: Update internal VS Code secret storage
 	if (value) {
 		await context.secrets.store(key, value)
 	} else {
