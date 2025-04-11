@@ -275,7 +275,6 @@ const BrowserSessionRow = memo((props: BrowserSessionRowProps) => {
 				consoleLogs: currentPage?.currentState.consoleLogs,
 				screenshot: currentPage?.currentState.screenshot,
 			}
-
 	const [actionContent, { height: actionHeight }] = useSize(
 		<div>
 			{currentPage?.nextAction?.messages.map((message) => (
@@ -365,7 +364,7 @@ const BrowserSessionRow = memo((props: BrowserSessionRowProps) => {
 						}}>
 						<div style={urlTextStyle}>{displayState.url || "http"}</div>
 					</div>
-					<BrowserSettingsMenu disabled={!shouldShowSettings} maxWidth={maxWidth} />
+					<BrowserSettingsMenu />
 				</div>
 
 				{/* Screenshot Area */}
