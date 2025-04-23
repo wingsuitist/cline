@@ -1,8 +1,11 @@
 import { globby, Options } from "globby"
 import os from "os"
 import * as path from "path"
+import { arePathsEqual } from "@utils/path"
+
+// <letsboot.ch fork change> 
 import * as vscode from "vscode"
-import { arePathsEqual } from "../../utils/path"
+// </letsboot.ch fork change> 
 
 export async function listFiles(dirPath: string, recursive: boolean, limit: number): Promise<[string[], boolean]> {
 	// First resolve the path normally - path.resolve doesn't care about glob special characters
