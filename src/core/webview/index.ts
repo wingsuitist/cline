@@ -5,9 +5,9 @@ import { getUri } from "./getUri"
 import { getTheme } from "@integrations/theme/getTheme"
 import { Controller } from "@core/controller/index"
 import { findLast } from "@shared/array"
-// <letsboot.ch fork change> 
+// <letsboot.ch fork change>
 import { applyStateOverwriteOnStartup, applySecretOverwriteOnStartup } from "../../fork/letsboot/state-override"
-// </letsboot.ch fork change> 
+// </letsboot.ch fork change>
 
 /*
 https://github.com/microsoft/vscode-webview-ui-toolkit-samples/blob/main/default/weather-webview/src/providers/WeatherViewProvider.ts

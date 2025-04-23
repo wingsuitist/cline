@@ -11,9 +11,9 @@ import { ChatSettings } from "@shared/ChatSettings"
 import { TelemetrySetting } from "@shared/TelemetrySetting"
 import { UserInfo } from "@shared/UserInfo"
 import { ClineRulesToggles } from "@shared/cline-rules"
-// <letsboot.ch fork change> 
+// <letsboot.ch fork change>
 import { updateOverwrittenState, updateOverwrittenSecret } from "../../fork/letsboot/state-override"
-// </letsboot.ch fork change> 
+// </letsboot.ch fork change>
 /*
 	Storage
 	https://dev.to/kompotkot/how-to-use-secretstorage-in-your-vscode-extensions-2hco

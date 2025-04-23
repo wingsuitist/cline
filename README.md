@@ -1,4 +1,4 @@
-# Fork with the following features
+# Letsboot Labmachine specific Fork
 
 - Set model and token in user settings.json.
 - Overwrite any of the state and secret using settiongs.json.
