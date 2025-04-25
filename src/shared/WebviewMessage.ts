@@ -45,6 +45,8 @@ export interface WebviewMessage {
 		| "checkpointRestore"
 		| "taskCompletionViewChanges"
 		| "openExtensionSettings"
+		| "dumpFullStateRequest"
+		| "dumpFullStateResponse"
 		| "requestVsCodeLmModels"
 		| "toggleToolAutoApprove"
 		| "toggleMcpServer"

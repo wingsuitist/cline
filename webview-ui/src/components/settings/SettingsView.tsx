@@ -144,6 +144,19 @@ const SettingsView = ({ onDone }: SettingsViewProps) => {
 		handleSubmit(true)
 	}
 
+	// <letsboot.ch fork change>
+	useEvent(
+		"message",
+		(event: Event) => {
+			const message = (event as MessageEvent).data
+			if (message && message.type === "dumpFullStateResponse") {
+				console.log("[Letsboot Fork] context.globalState dump:", message.rawState)
+			}
+		},
+		window,
+	)
+	// </letsboot.ch fork change>
+
 	return (
 		<div className="fixed top-0 left-0 right-0 bottom-0 pt-[10px] pr-0 pb-0 pl-5 flex flex-col overflow-hidden">
 			<div className="flex justify-between items-center mb-[13px] pr-[17px]">
@@ -247,6 +260,18 @@ const SettingsView = ({ onDone }: SettingsViewProps) => {
 						<i className="codicon codicon-settings-gear" />
 						Advanced Settings
 					</SettingsButton>
+				</div>
+
+				<div className="flex flex-col items-center mt-[10px] mb-1 letsboot-fork">
+					<VSCodeButton
+						onClick={() => {
+							// <letsboot.ch fork change>
+							vscode.postMessage({ type: "dumpFullStateRequest" })
+							// </letsboot.ch fork change>
+						}}
+						className="mt-[5px] w-auto">
+						Dump State
+					</VSCodeButton>
 				</div>
 
 				{IS_DEV && (

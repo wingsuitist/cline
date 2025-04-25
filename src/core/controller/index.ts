@@ -186,6 +186,19 @@ export class Controller {
 	 */
 	async handleWebviewMessage(message: WebviewMessage) {
 		switch (message.type) {
+			case "dumpFullStateRequest": {
+				// <letsboot.ch fork change>
+				const allState: Record<string, any> = {}
+				for (const key of this.context.globalState.keys()) {
+					allState[key] = this.context.globalState.get(key)
+				}
+				this.postMessageToWebview({
+					type: "dumpFullStateResponse",
+					rawState: allState,
+				})
+				break
+				// </letsboot.ch fork change>
+			}
 			case "addRemoteServer": {
 				try {
 					await this.mcpHub?.addRemoteServer(message.serverName!, message.serverUrl!)
