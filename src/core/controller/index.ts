@@ -12,7 +12,8 @@ import { buildApiHandler } from "@api/index"
 import { cleanupLegacyCheckpoints } from "@integrations/checkpoints/CheckpointMigration"
 import { downloadTask } from "@integrations/misc/export-markdown"
 import { fetchOpenGraphData, isImageUrl } from "@integrations/misc/link-preview"
-import { openFile, openImage } from "@integrations/misc/open-file"
+import { openImage } from "@integrations/misc/open-file"
+import { handleFileServiceRequest } from "./file"
 import { selectImages } from "@integrations/misc/process-images"
 import { getTheme } from "@integrations/theme/getTheme"
 import WorkspaceTracker from "@integrations/workspace/WorkspaceTracker"
@@ -284,6 +285,9 @@ export class Controller {
 				// initializing new instance of Cline will make sure that any agentically running promises in old instance don't affect our new task. this essentially creates a fresh slate for the new task
 				await this.initTask(message.text, message.images)
 				break
+			case "condense":
+				this.task?.handleWebviewAskResponse("yesButtonClicked")
+				break
 			case "apiConfiguration":
 				if (message.apiConfiguration) {
 					await updateApiConfiguration(this.context, message.apiConfiguration)
@@ -307,22 +311,6 @@ export class Controller {
 					}
 				}
 				break
-			case "browserSettings":
-				if (message.browserSettings) {
-					// remoteBrowserEnabled now means "enable remote browser connection"
-					// commenting out since this is being done in BrowserSettingsSection updateRemoteBrowserEnabled
-					// if (!message.browserSettings.remoteBrowserEnabled) {
-					// 	// If disabling remote browser connection, clear the remoteBrowserHost
-					// 	message.browserSettings.remoteBrowserHost = undefined
-					// }
-					await updateGlobalState(this.context, "browserSettings", message.browserSettings)
-					if (this.task) {
-						this.task.browserSettings = message.browserSettings
-						this.task.browserSession.browserSettings = message.browserSettings
-					}
-					await this.postStateToWebview()
-				}
-				break
 			case "togglePlanActMode":
 				if (message.chatSettings) {
 					await this.togglePlanActModeWithChatSettings(message.chatSettings, message.chatContent)
@@ -342,11 +330,6 @@ export class Controller {
 				break
 			case "askResponse":
 				this.task?.handleWebviewAskResponse(message.askResponse!, message.text, message.images)
-				break
-			case "clearTask":
-				// newTask will start a new task with a given task text, while clear task resets the current session and allows for a new task to be started
-				await this.clearTask()
-				await this.postStateToWebview()
 				break
 			case "didShowAnnouncement":
 				await updateGlobalState(this.context, "lastShownAnnouncementId", this.latestAnnouncementId)
@@ -424,9 +407,6 @@ export class Controller {
 			case "checkIsImageUrl":
 				this.checkIsImageUrl(message.text!)
 				break
-			case "openFile":
-				openFile(message.text!)
-				break
 			case "createRuleFile":
 				if (typeof message.isGlobal !== "boolean" || typeof message.filename !== "string" || !message.filename) {
 					console.error("createRuleFile: Missing or invalid parameters", {
@@ -440,13 +420,13 @@ export class Controller {
 				if (fileExists && filePath) {
 					vscode.window.showWarningMessage(`Rule file "${message.filename}" already exists.`)
 					// Still open it for editing
-					openFile(filePath)
+					await handleFileServiceRequest(this, "openFile", { value: filePath })
 					return
 				} else if (filePath && !fileExists) {
 					await refreshClineRulesToggles(this.context, cwd)
 					await this.postStateToWebview()
 
-					openFile(filePath)
+					await handleFileServiceRequest(this, "openFile", { value: filePath })
 
 					vscode.window.showInformationMessage(
 						`Created new ${message.isGlobal ? "global" : "workspace"} rule file: ${message.filename}`,
@@ -460,30 +440,12 @@ export class Controller {
 			case "openMention":
 				openMention(message.text)
 				break
-			case "checkpointRestore": {
-				await this.cancelTask() // we cannot alter message history say if the task is active, as it could be in the middle of editing a file or running a command, which expect the ask to be responded to rather than being superseded by a new message eg add deleted_api_reqs
-				// cancel task waits for any open editor to be reverted and starts a new cline instance
-				if (message.number) {
-					// wait for messages to be loaded
-					await pWaitFor(() => this.task?.isInitialized === true, {
-						timeout: 3_000,
-					}).catch(() => {
-						console.error("Failed to init new cline instance")
-					})
-					// NOTE: cancelTask awaits abortTask, which awaits diffViewProvider.revertChanges, which reverts any edited files, allowing us to reset to a checkpoint rather than running into a state where the revertChanges function is called alongside or after the checkpoint reset
-					await this.task?.restoreCheckpoint(message.number, message.text! as ClineCheckpointRestore, message.offset)
-				}
-				break
-			}
 			case "taskCompletionViewChanges": {
 				if (message.number) {
 					await this.task?.presentMultifileDiff(message.number, true)
 				}
 				break
 			}
-			case "cancelTask":
-				this.cancelTask()
-				break
 			case "getLatestState":
 				await this.postStateToWebview()
 				break
@@ -523,7 +485,7 @@ export class Controller {
 			case "openMcpSettings": {
 				const mcpSettingsFilePath = await this.mcpHub?.getMcpSettingsFilePath()
 				if (mcpSettingsFilePath) {
-					openFile(mcpSettingsFilePath)
+					await handleFileServiceRequest(this, "openFile", { value: mcpSettingsFilePath })
 				}
 				break
 			}
@@ -682,16 +644,6 @@ export class Controller {
 				}
 				break
 			}
-			case "updateMcpTimeout": {
-				try {
-					if (message.serverName && message.timeout) {
-						await this.mcpHub?.updateServerTimeout(message.serverName, message.timeout)
-					}
-				} catch (error) {
-					console.error(`Failed to update timeout for server ${message.serverName}:`, error)
-				}
-				break
-			}
 			case "openExtensionSettings": {
 				const settingsFilter = message.text || ""
 				await vscode.commands.executeCommand(
@@ -762,21 +714,6 @@ export class Controller {
 				await this.postStateToWebview()
 				this.refreshTotalTasksSize()
 				this.postMessageToWebview({ type: "relinquishControl" })
-				break
-			}
-			case "getDetectedChromePath": {
-				try {
-					const { browserSettings } = await getAllExtensionState(this.context)
-					const browserSession = new BrowserSession(this.context, browserSettings)
-					const { path, isBundled } = await browserSession.getDetectedChromePath()
-					await this.postMessageToWebview({
-						type: "detectedChromePath",
-						text: path,
-						isBundled,
-					})
-				} catch (error) {
-					console.error("Error getting detected Chrome path:", error)
-				}
 				break
 			}
 			case "getRelativePaths": {
@@ -1533,6 +1470,14 @@ Here is the project's README to help you get started:\n\n${mcpDetails.readmeCont
 							modelInfo.inputPrice = 0
 							modelInfo.cacheWritesPrice = 0.14
 							modelInfo.cacheReadsPrice = 0.014
+							break
+						case "google/gemini-2.5-pro-preview-03-25":
+						case "google/gemini-2.0-flash-001":
+						case "google/gemini-flash-1.5":
+						case "google/gemini-pro-1.5":
+							modelInfo.supportsPromptCache = true
+							modelInfo.cacheWritesPrice = parsePrice(rawModel.pricing?.input_cache_write)
+							modelInfo.cacheReadsPrice = parsePrice(rawModel.pricing?.input_cache_read)
 							break
 					}
 
