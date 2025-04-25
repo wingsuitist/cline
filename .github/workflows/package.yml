@@ -3,7 +3,7 @@ name: "Package Extension"
 on:
     push:
         branches:
-            - "**" # Run on all branches
+            - main
 
 jobs:
     test:
@@ -11,7 +11,7 @@ jobs:
 
     package:
         needs: test
-        name: Create VSIX Package
+        name: Create VSIX Package - Letsboot Fork
         runs-on: ubuntu-latest
 
         steps:
