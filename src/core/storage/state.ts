@@ -3,7 +3,7 @@ import { DEFAULT_CHAT_SETTINGS } from "@shared/ChatSettings"
 import { DEFAULT_BROWSER_SETTINGS } from "@shared/BrowserSettings"
 import { DEFAULT_AUTO_APPROVAL_SETTINGS } from "@shared/AutoApprovalSettings"
 import { GlobalStateKey, SecretKey } from "./state-keys"
-import { ApiConfiguration, ApiProvider, ModelInfo } from "@shared/api"
+import { ApiConfiguration, ApiProvider, BedrockModelId, ModelInfo } from "@shared/api"
 import { HistoryItem } from "@shared/HistoryItem"
 import { AutoApprovalSettings } from "@shared/AutoApprovalSettings"
 import { BrowserSettings } from "@shared/BrowserSettings"
@@ -93,6 +93,8 @@ export async function getAllExtensionState(context: vscode.ExtensionContext) {
 		awsBedrockEndpoint,
 		awsProfile,
 		awsUseProfile,
+		awsBedrockCustomSelected,
+		awsBedrockCustomModelBaseId,
 		vertexProjectId,
 		vertexRegion,
 		openAiBaseUrl,
@@ -139,6 +141,8 @@ export async function getAllExtensionState(context: vscode.ExtensionContext) {
 		previousModeVsCodeLmModelSelector,
 		previousModeThinkingBudgetTokens,
 		previousModeReasoningEffort,
+		previousModeAwsBedrockCustomSelected,
+		previousModeAwsBedrockCustomModelBaseId,
 		qwenApiLine,
 		liteLlmApiKey,
 		telemetrySetting,
@@ -151,6 +155,8 @@ export async function getAllExtensionState(context: vscode.ExtensionContext) {
 		planActSeparateModelsSettingRaw,
 		favoritedModelIds,
 		globalClineRulesToggles,
+		requestTimeoutMs,
+		shellIntegrationTimeout,
 	] = await Promise.all([
 		getGlobalState(context, "apiProvider") as Promise<ApiProvider | undefined>,
 		getGlobalState(context, "apiModelId") as Promise<string | undefined>,
@@ -166,6 +172,8 @@ export async function getAllExtensionState(context: vscode.ExtensionContext) {
 		getGlobalState(context, "awsBedrockEndpoint") as Promise<string | undefined>,
 		getGlobalState(context, "awsProfile") as Promise<string | undefined>,
 		getGlobalState(context, "awsUseProfile") as Promise<boolean | undefined>,
+		getGlobalState(context, "awsBedrockCustomSelected") as Promise<boolean | undefined>,
+		getGlobalState(context, "awsBedrockCustomModelBaseId") as Promise<BedrockModelId | undefined>,
 		getGlobalState(context, "vertexProjectId") as Promise<string | undefined>,
 		getGlobalState(context, "vertexRegion") as Promise<string | undefined>,
 		getGlobalState(context, "openAiBaseUrl") as Promise<string | undefined>,
@@ -212,6 +220,8 @@ export async function getAllExtensionState(context: vscode.ExtensionContext) {
 		getGlobalState(context, "previousModeVsCodeLmModelSelector") as Promise<vscode.LanguageModelChatSelector | undefined>,
 		getGlobalState(context, "previousModeThinkingBudgetTokens") as Promise<number | undefined>,
 		getGlobalState(context, "previousModeReasoningEffort") as Promise<string | undefined>,
+		getGlobalState(context, "previousModeAwsBedrockCustomSelected") as Promise<boolean | undefined>,
+		getGlobalState(context, "previousModeAwsBedrockCustomModelBaseId") as Promise<BedrockModelId | undefined>,
 		getGlobalState(context, "qwenApiLine") as Promise<string | undefined>,
 		getSecret(context, "liteLlmApiKey") as Promise<string | undefined>,
 		getGlobalState(context, "telemetrySetting") as Promise<TelemetrySetting | undefined>,
@@ -224,6 +234,8 @@ export async function getAllExtensionState(context: vscode.ExtensionContext) {
 		getGlobalState(context, "planActSeparateModelsSetting") as Promise<boolean | undefined>,
 		getGlobalState(context, "favoritedModelIds") as Promise<string[] | undefined>,
 		getGlobalState(context, "globalClineRulesToggles") as Promise<ClineRulesToggles | undefined>,
+		getGlobalState(context, "requestTimeoutMs") as Promise<number | undefined>,
+		getGlobalState(context, "shellIntegrationTimeout") as Promise<number | undefined>,
 	])
 
 	let apiProvider: ApiProvider
@@ -280,6 +292,8 @@ export async function getAllExtensionState(context: vscode.ExtensionContext) {
 			awsBedrockEndpoint,
 			awsProfile,
 			awsUseProfile,
+			awsBedrockCustomSelected,
+			awsBedrockCustomModelBaseId,
 			vertexProjectId,
 			vertexRegion,
 			openAiBaseUrl,
@@ -323,6 +337,7 @@ export async function getAllExtensionState(context: vscode.ExtensionContext) {
 			xaiApiKey,
 			sambanovaApiKey,
 			favoritedModelIds,
+			requestTimeoutMs,
 		},
 		lastShownAnnouncementId,
 		customInstructions,
@@ -339,9 +354,12 @@ export async function getAllExtensionState(context: vscode.ExtensionContext) {
 		previousModeVsCodeLmModelSelector,
 		previousModeThinkingBudgetTokens,
 		previousModeReasoningEffort,
+		previousModeAwsBedrockCustomSelected,
+		previousModeAwsBedrockCustomModelBaseId,
 		mcpMarketplaceEnabled,
 		telemetrySetting: telemetrySetting || "unset",
 		planActSeparateModelsSetting,
+		shellIntegrationTimeout: shellIntegrationTimeout || 4000,
 	}
 }
 
@@ -360,6 +378,8 @@ export async function updateApiConfiguration(context: vscode.ExtensionContext, a
 		awsBedrockEndpoint,
 		awsProfile,
 		awsUseProfile,
+		awsBedrockCustomSelected,
+		awsBedrockCustomModelBaseId,
 		vertexProjectId,
 		vertexRegion,
 		openAiBaseUrl,
@@ -417,6 +437,8 @@ export async function updateApiConfiguration(context: vscode.ExtensionContext, a
 	await updateGlobalState(context, "awsBedrockEndpoint", awsBedrockEndpoint)
 	await updateGlobalState(context, "awsProfile", awsProfile)
 	await updateGlobalState(context, "awsUseProfile", awsUseProfile)
+	await updateGlobalState(context, "awsBedrockCustomSelected", awsBedrockCustomSelected)
+	await updateGlobalState(context, "awsBedrockCustomModelBaseId", awsBedrockCustomModelBaseId)
 	await updateGlobalState(context, "vertexProjectId", vertexProjectId)
 	await updateGlobalState(context, "vertexRegion", vertexRegion)
 	await updateGlobalState(context, "openAiBaseUrl", openAiBaseUrl)
@@ -460,6 +482,7 @@ export async function updateApiConfiguration(context: vscode.ExtensionContext, a
 	await storeSecret(context, "clineApiKey", clineApiKey)
 	await storeSecret(context, "sambanovaApiKey", sambanovaApiKey)
 	await updateGlobalState(context, "favoritedModelIds", favoritedModelIds)
+	await updateGlobalState(context, "requestTimeoutMs", apiConfiguration.requestTimeoutMs)
 }
 
 export async function resetExtensionState(context: vscode.ExtensionContext) {
