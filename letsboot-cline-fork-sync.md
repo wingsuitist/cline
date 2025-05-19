@@ -1,0 +1,5 @@
+- Create branch called fork-diff-X.X.X use `npm pkg get version | sed 's/"//g'` to get version of current cline branch based on local main.
+- Switch back to main branch.
+- Get newest "tag" from already configured upstream: https://github.com/cline/cline.git
+- Merge the fork-diff-X.X.X branch into the main branch.
+- Ensure the letsboot changes are preserved
