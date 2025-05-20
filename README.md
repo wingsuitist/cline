@@ -4,7 +4,7 @@
 - Overwrite any of the state and secret using settiongs.json.
 - Overwrite default dirsToIgnore in the user settings.json.
 - Update overwrite state and secrets from UI
-- Debug button to dump state to the console
+- Debug button to dump state to a file `.state.dump.json`
 - Package as vsxi in the fork project
 
 ## Install fork:

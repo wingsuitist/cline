@@ -45,6 +45,7 @@ export interface ExtensionMessage {
 		| "fileSearchResults"
 		| "grpc_response" // New type for gRPC responses
 		| "setActiveQuote"
+		| "dumpStateToFile"
 	text?: string
 	action?:
 		| "chatButtonClicked"

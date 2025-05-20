@@ -171,6 +171,14 @@ const SettingsView = ({ onDone }: SettingsViewProps) => {
 				<h3 className="text-[var(--vscode-foreground)] m-0">Settings</h3>
 				<VSCodeButton onClick={() => handleSubmit(false)}>Save</VSCodeButton>
 			</div>
+			<div className="mb-[15px] pr-[17px]">
+				<VSCodeButton onClick={() => vscode.postMessage({ type: "dumpStateToFile" })} className="w-full">
+					Dump State to File
+				</VSCodeButton>
+				<p className="text-xs mt-[5px] text-[var(--vscode-descriptionForeground)]">
+					This will write the current extension state to .state.dump.json in the project root.
+				</p>
+			</div>
 			<div className="grow overflow-y-scroll pr-2 flex flex-col">
 				{/* Tabs container */}
 				{planActSeparateModelsSetting ? (
