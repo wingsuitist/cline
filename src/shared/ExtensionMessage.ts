@@ -42,6 +42,7 @@ export interface ExtensionMessage {
 		| "browserConnectionResult"
 		| "fileSearchResults"
 		| "grpc_response" // New type for gRPC responses
+		| "dumpStateToFile" // letsboot fork
 	text?: string
 	action?:
 		| "chatButtonClicked"

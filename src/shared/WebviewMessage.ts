@@ -32,6 +32,7 @@ export interface WebviewMessage {
 		| "grpc_request"
 		| "grpc_request_cancel"
 		| "toggleWorkflow"
+		| "dumpStateToFile"
 
 	text?: string
 	disabled?: boolean
