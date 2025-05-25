@@ -157,6 +157,8 @@ export class WebviewProvider implements vscode.WebviewViewProvider {
 			this.controller.clearTask()
 
 			this.outputChannel.appendLine("Webview view resolved")
+
+			// Title setting logic removed to allow VSCode to use the container title primarily.
 		}
 	}
 
