@@ -470,7 +470,7 @@ export class Controller {
 				}
 				break
 			}
-      // <letsboot fork>
+			// <letsboot fork>
 			case "dumpStateToFile": {
 				try {
 					const state = await this.getStateToPostToWebview()
@@ -490,7 +490,7 @@ export class Controller {
 				}
 				break
 			}
-      // </letsboot fork>
+			// </letsboot fork>
 			// Add more switch case statements here as more webview message commands
 			// are created within the webview context (i.e. inside media/main.js)
 		}
