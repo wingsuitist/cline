@@ -13,7 +13,6 @@ export interface WebviewMessage {
 		| "newTask"
 		| "condense"
 		| "reportBug"
-		| "openInBrowser"
 		| "showChatView"
 		| "requestVsCodeLmModels"
 		| "authStateChanged"
@@ -27,7 +26,6 @@ export interface WebviewMessage {
 		| "clearAllTaskHistory"
 		| "fetchUserCreditsData"
 		| "optionsResponse"
-		| "requestTotalTasksSize"
 		| "searchFiles"
 		| "grpc_request"
 		| "grpc_request_cancel"
@@ -55,8 +53,6 @@ export interface WebviewMessage {
 	// For auth
 	user?: UserInfo | null
 	customToken?: string
-	// For openInBrowser
-	url?: string
 	planActSeparateModelsSetting?: boolean
 	enableCheckpointsSetting?: boolean
 	mcpMarketplaceEnabled?: boolean
