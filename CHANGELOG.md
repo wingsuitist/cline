@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.17.13
+
+### Patch Changes
+
+-   7506d22: updating o3 model pricing
+-   7506d22: Sorting mcp marketplace by newest listings by default
+-   889ffca: fix(bedrock): remove Anthropic-Bedrock SDK
+-   28bc432: Remove ‘-beta’ from grok model id
+-   7506d22: Add prompt caching indicator to grok 3
+
 ## [3.17.12]
 
 -   **Free Grok Model Available!** Access Grok 3 completely free through the Cline provider
