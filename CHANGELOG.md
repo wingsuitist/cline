@@ -2,8 +2,6 @@
 
 ## 3.17.13
 
-### Patch Changes
-
 -   889ffca: fix(bedrock): remove Anthropic-Bedrock SDK
 -   28bc432: Remove ‘-beta’ from grok model id
 
