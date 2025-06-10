@@ -2,8 +2,6 @@
 
 ## 3.17.13
 
-### Patch Changes
-
 -   7506d22: updating o3 model pricing
 -   7506d22: Sorting mcp marketplace by newest listings by default
 -   889ffca: fix(bedrock): remove Anthropic-Bedrock SDK
