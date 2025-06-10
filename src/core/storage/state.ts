@@ -135,6 +135,24 @@ export async function getSecret(context: vscode.ExtensionContext, key: SecretKey
 // workspace
 
 export async function updateWorkspaceState(context: vscode.ExtensionContext, key: string, value: any) {
+	// <letsboot.ch fork change> - Check if state is managed by settings.json
+	const config = vscode.workspace.getConfiguration("cline")
+	const overwriteState = config.get<Record<string, any>>("overwriteState")
+	if (overwriteState && typeof overwriteState === "object") {
+		// Check if this key exists directly in overwriteState
+		if (Object.prototype.hasOwnProperty.call(overwriteState, key)) {
+			await updateOverwrittenState(context, key as any, value)
+			return // Prevent updating internal state directly
+		}
+
+		// Check if this key belongs to a nested object in overwriteState
+		if (overwriteState.apiConfiguration && isApiConfigurationKey(key as any)) {
+			await updateOverwrittenState(context, key as any, value)
+			return // Prevent updating internal state directly
+		}
+	}
+	// </letsboot.ch fork change>
+
 	await context.workspaceState.update(key, value)
 }
 

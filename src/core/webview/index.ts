@@ -6,7 +6,11 @@ import { getTheme } from "@integrations/theme/getTheme"
 import { Controller } from "@core/controller/index"
 import { findLast } from "@shared/array"
 // <letsboot.ch fork change>
-import { applyStateOverwriteOnStartup, applySecretOverwriteOnStartup } from "../../fork/letsboot/state-override"
+import {
+	applyStateOverwriteOnStartup,
+	applySecretOverwriteOnStartup,
+	clearAppliedOverridesCache,
+} from "../../fork/letsboot/state-override"
 // </letsboot.ch fork change>
 import { readFile } from "fs/promises"
 import path from "node:path"
@@ -158,6 +162,19 @@ export class WebviewProvider implements vscode.WebviewViewProvider {
 						// Update state when marketplace tab setting changes
 						await this.controller.postStateToWebview()
 					}
+					// <letsboot.ch fork change> - Handle Cline override settings changes
+					if (
+						e &&
+						(e.affectsConfiguration("cline.overwriteState") || e.affectsConfiguration("cline.overwriteSecrets"))
+					) {
+						console.log("[Letsboot Fork] Cline override settings changed, clearing cache and re-applying...")
+						clearAppliedOverridesCache()
+						await applyStateOverwriteOnStartup(this.context)
+						await applySecretOverwriteOnStartup(this.context)
+						// Refresh the webview state to reflect changes
+						await this.controller.postStateToWebview()
+					}
+					// </letsboot.ch fork change>
 				},
 				null,
 				this.disposables,
