@@ -5,6 +5,9 @@ import { getUri } from "./getUri"
 import { getTheme } from "@integrations/theme/getTheme"
 import { Controller } from "@core/controller/index"
 import { findLast } from "@shared/array"
+// <letsboot.ch fork change>
+import { applyStateOverwriteOnStartup, applySecretOverwriteOnStartup } from "../../fork/letsboot/state-override"
+// </letsboot.ch fork change>
 import { readFile } from "fs/promises"
 import path from "node:path"
 import { WebviewProviderType } from "@/shared/webview/types"
@@ -82,6 +85,11 @@ export class WebviewProvider implements vscode.WebviewViewProvider {
 			this.context.extensionMode === vscode.ExtensionMode.Development
 				? await this.getHMRHtmlContent(webviewView.webview)
 				: this.getHtmlContent(webviewView.webview)
+
+		// <letsboot.ch fork change> - Apply initial state/secret overrides from settings.json
+		await applyStateOverwriteOnStartup(this.context)
+		await applySecretOverwriteOnStartup(this.context)
+		// </letsboot.ch fork change>
 
 		// Sets up an event listener to listen for messages passed from the webview view context
 		// and executes code based on the message that is received
@@ -236,7 +244,7 @@ export class WebviewProvider implements vscode.WebviewViewProvider {
 				<link rel="stylesheet" type="text/css" href="${stylesUri}">
 				<link href="${codiconsUri}" rel="stylesheet" />
 				<link href="${katexCssUri}" rel="stylesheet" />
-				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src https://*.posthog.com https://*.firebaseauth.com https://*.firebaseio.com https://*.googleapis.com https://*.firebase.com; font-src ${webview.cspSource} data:; style-src ${webview.cspSource} 'unsafe-inline'; img-src ${webview.cspSource} https: data:; script-src 'nonce-${nonce}' 'unsafe-eval';">
+				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src https://*.posthog.com https://*.firebaseauth.com https://*.firebaseio.com https://*.googleapis.com https://*.firebase.com https://data.cline.bot; font-src ${webview.cspSource} data:; style-src ${webview.cspSource} 'unsafe-inline'; img-src ${webview.cspSource} https: data:; script-src 'nonce-${nonce}' 'unsafe-eval';">
 				<title>Cline</title>
 			</head>
 			<body>
