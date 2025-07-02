@@ -18,9 +18,10 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                os: [ubuntu-latest, windows-latest]
+                # letsboot fork: Disable Windows tests
+                os: [ubuntu-latest]
         runs-on: ${{ matrix.os }}
-        name: ${{ matrix.os == 'ubuntu-latest' && 'test' || format('test ({0})', matrix.os) }}
+        name: test
         defaults:
             run:
                 shell: bash

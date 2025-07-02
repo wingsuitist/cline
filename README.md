@@ -1,3 +1,36 @@
+
+# Letsboot Labmachine specific Fork
+
+This is a specific for for the Letsboot Labmachine project not intended to be pulled upstream.
+
+- Package as vsix in the fork project as cline-latest.vsix and the version from package.json (.github/workflows/letsboot-fork-package.yml).
+- Disable windows tests, as this fork isn't used or tested on Windows (.github/workflows/test.yml).
+
+## Install fork:
+
+```sh
+# Local VS Code
+curl -L -o /tmp/cline.vsix https://github.com/wingsuitist/cline/releases/download/latest/cline-latest.vsix
+code --force  --install-extension /tmp/cline.vsix
+rm /tmp/cline.vsix
+```
+
+```sh
+# Code Server
+curl -L -o /tmp/cline.vsix https://github.com/wingsuitist/cline/releases/download/latest/cline-latest.vsix
+code-server --force --install-extension /tmp/cline.vsix
+rm /tmp/cline.vsix
+```
+
+```sh
+# or use a specific version (example for v3.17.12)
+curl -L -o /tmp/cline.vsix https://github.com/wingsuitist/cline/releases/download/v3.17.12/cline-v3.17.12.vsix
+code-server --force --install-extension /tmp/cline.vsix
+rm /tmp/cline.vsix
+```
+
+----
+
 <div align="center"><sub>
 English | <a href="https://github.com/cline/cline/blob/main/locales/es/README.md" target="_blank">Español</a> | <a href="https://github.com/cline/cline/blob/main/locales/de/README.md" target="_blank">Deutsch</a> | <a href="https://github.com/cline/cline/blob/main/locales/ja/README.md" target="_blank">日本語</a> | <a href="https://github.com/cline/cline/blob/main/locales/zh-cn/README.md" target="_blank">简体中文</a> | <a href="https://github.com/cline/cline/blob/main/locales/zh-tw/README.md" target="_blank">繁體中文</a> | <a href="https://github.com/cline/cline/blob/main/locales/ko/README.md" target="_blank">한국어</a>
 </sub></div>
