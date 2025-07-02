@@ -3,6 +3,7 @@
 
 This is a specific for for the Letsboot Labmachine project not intended to be pulled upstream.
 
+- Button in the settings view to dump extension state into `.state.dump.json` in the workspace root. 
 - Package as vsix in the fork project as cline-latest.vsix and the version from package.json (.github/workflows/letsboot-fork-package.yml).
 - Disable windows tests, as this fork isn't used or tested on Windows (.github/workflows/test.yml).
 
