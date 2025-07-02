@@ -4,6 +4,7 @@
 This is a specific for for the Letsboot Labmachine project not intended to be pulled upstream.
 
 - Overwrite any state using `cline.overwriteState` in the users `settings.json` to preconfigure the state of the extension.
+- Mark the extension to be a fork by extending placeholderText with "(letsboot fork v3.18.1)".
 - Button in the settings view to dump extension state into `.state.dump.json` in the workspace root. 
 - Removed `.github/` folder from file ignore list (`src/services/search/file-search.ts`).
 - Package as vsix in the fork project as cline-latest.vsix and the version from package.json (.github/workflows/letsboot-fork-package.yml).
