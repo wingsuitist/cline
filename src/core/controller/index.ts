@@ -37,6 +37,13 @@ import {
 	updateGlobalState,
 	updateWorkspaceState,
 } from "../storage/state"
+// <letsboot fork>
+import {
+	updateGlobalStateWithOverride,
+	updateWorkspaceStateWithOverride,
+	storeSecretWithOverride,
+} from "../../storage/state-overwrite"
+// </letsboot fork>
 import { Task } from "../task"
 import { ClineRulesToggles } from "@shared/cline-rules"
 import { sendStateUpdate } from "./state/subscribeToState"
@@ -121,9 +128,11 @@ export class Controller {
 	// Auth methods
 	async handleSignOut() {
 		try {
-			await storeSecret(this.context, "clineApiKey", undefined)
-			await updateGlobalState(this.context, "userInfo", undefined)
-			await updateWorkspaceState(this.context, "apiProvider", "openrouter")
+			// <letsboot fork>
+			await storeSecretWithOverride(this.context, "clineApiKey", undefined)
+			await updateGlobalStateWithOverride(this.context, "userInfo", undefined)
+			await updateWorkspaceStateWithOverride(this.context, "apiProvider", "openrouter")
+			// </letsboot fork>
 			await this.postStateToWebview()
 			vscode.window.showInformationMessage("Successfully logged out of Cline")
 		} catch (error) {
@@ -132,7 +141,9 @@ export class Controller {
 	}
 
 	async setUserInfo(info?: UserInfo) {
-		await updateGlobalState(this.context, "userInfo", info)
+		// <letsboot fork>
+		await updateGlobalStateWithOverride(this.context, "userInfo", info)
+		// </letsboot fork>
 	}
 
 	async initTask(task?: string, images?: string[], files?: string[], historyItem?: HistoryItem) {
@@ -786,7 +797,7 @@ export class Controller {
 		apiConversationHistory: Anthropic.MessageParam[]
 	}> {
 		const history = ((await getGlobalState(this.context, "taskHistory")) as HistoryItem[] | undefined) || []
-		const historyItem = history.find((item) => item.id === id)
+		const historyItem = history.find((item: HistoryItem) => item.id === id)
 		if (historyItem) {
 			const taskDirPath = path.join(this.context.globalStorageUri.fsPath, "tasks", id)
 			const apiConversationHistoryFilePath = path.join(taskDirPath, GlobalFileNames.apiConversationHistory)
@@ -880,12 +891,14 @@ export class Controller {
 			version: this.context.extension?.packageJSON?.version ?? "",
 			apiConfiguration,
 			uriScheme: vscode.env.uriScheme,
-			currentTaskItem: this.task?.taskId ? (taskHistory || []).find((item) => item.id === this.task?.taskId) : undefined,
+			currentTaskItem: this.task?.taskId
+				? (taskHistory || []).find((item: HistoryItem) => item.id === this.task?.taskId)
+				: undefined,
 			checkpointTrackerErrorMessage: this.task?.taskState.checkpointTrackerErrorMessage,
 			clineMessages: this.task?.messageStateHandler.getClineMessages() || [],
 			taskHistory: (taskHistory || [])
-				.filter((item) => item.ts && item.task)
-				.sort((a, b) => b.ts - a.ts)
+				.filter((item: HistoryItem) => item.ts && item.task)
+				.sort((a: HistoryItem, b: HistoryItem) => b.ts - a.ts)
 				.slice(0, 100), // for now we're only getting the latest 100 tasks, but a better solution here is to only pass in 3 for recent task history, and then get the full task history on demand when going to the task history view (maybe with pagination?)
 			shouldShowAnnouncement: lastShownAnnouncementId !== this.latestAnnouncementId,
 			platform: process.platform as Platform,

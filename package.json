@@ -318,7 +318,13 @@
 		},
 		"configuration": {
 			"title": "Cline",
-			"properties": {}
+			"properties": {
+				"cline.overwriteState": {
+					"type": "object",
+					"description": "[Letsboot Fork] Override state properties. Use state dump button to see possible settings to overwrite.",
+					"additionalProperties": true
+				}
+			}
 		}
 	},
 	"scripts": {

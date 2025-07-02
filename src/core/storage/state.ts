@@ -12,6 +12,9 @@ import { TelemetrySetting } from "@shared/TelemetrySetting"
 import { UserInfo } from "@shared/UserInfo"
 import { ClineRulesToggles } from "@shared/cline-rules"
 import { migrateEnableCheckpointsSetting, migrateMcpMarketplaceEnableSetting } from "./state-migrations"
+// <letsboot fork>
+import { updateOverriddenProperty } from "../../storage/state-overwrite"
+// </letsboot fork>
 /*
 	Storage
 	https://dev.to/kompotkot/how-to-use-secretstorage-in-your-vscode-extensions-2hco
@@ -22,6 +25,10 @@ import { migrateEnableCheckpointsSetting, migrateMcpMarketplaceEnableSetting } f
 
 export async function updateGlobalState(context: vscode.ExtensionContext, key: GlobalStateKey, value: any) {
 	await context.globalState.update(key, value)
+	// <letsboot fork>
+	// Update settings.json if this property was originally overridden
+	await updateOverriddenProperty(context, key, value)
+	// </letsboot fork>
 }
 
 export async function getGlobalState(context: vscode.ExtensionContext, key: GlobalStateKey) {
@@ -36,6 +43,10 @@ export async function storeSecret(context: vscode.ExtensionContext, key: SecretK
 	} else {
 		await context.secrets.delete(key)
 	}
+	// <letsboot fork>
+	// Update settings.json if this property was originally overridden
+	await updateOverriddenProperty(context, key, value)
+	// </letsboot fork>
 }
 
 export async function getSecret(context: vscode.ExtensionContext, key: SecretKey) {
@@ -46,6 +57,10 @@ export async function getSecret(context: vscode.ExtensionContext, key: SecretKey
 
 export async function updateWorkspaceState(context: vscode.ExtensionContext, key: string, value: any) {
 	await context.workspaceState.update(key, value)
+	// <letsboot fork>
+	// Update settings.json if this property was originally overridden
+	await updateOverriddenProperty(context, key, value)
+	// </letsboot fork>
 }
 
 export async function getWorkspaceState(context: vscode.ExtensionContext, key: string) {
@@ -311,7 +326,9 @@ export async function getAllExtensionState(context: vscode.ExtensionContext) {
 		await updateGlobalState(context, "planActSeparateModelsSetting", planActSeparateModelsSetting)
 	}
 
-	return {
+	// <letsboot fork>
+	const baseState = {
+		// </letsboot fork>
 		apiConfiguration: {
 			apiProvider,
 			apiModelId,
@@ -425,6 +442,10 @@ export async function getAllExtensionState(context: vscode.ExtensionContext) {
 		defaultTerminalProfile: defaultTerminalProfile ?? "default",
 		globalWorkflowToggles: globalWorkflowToggles || {},
 	}
+
+	// <letsboot fork>
+	return baseState
+	// </letsboot fork>
 }
 
 export async function updateApiConfiguration(context: vscode.ExtensionContext, apiConfiguration: ApiConfiguration) {

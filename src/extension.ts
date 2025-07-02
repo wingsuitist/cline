@@ -27,6 +27,9 @@ import {
 	migrateCustomInstructionsToGlobalRules,
 	migrateModeFromWorkspaceStorageToControllerState,
 } from "./core/storage/state-migrations"
+// <letsboot fork>
+import { applyStateOverridesOnStartup } from "./storage/state-overwrite"
+// </letsboot fork>
 
 import { sendFocusChatInputEvent } from "./core/controller/ui/subscribeToFocusChatInput"
 import { FileContextTracker } from "./core/context/context-tracking/FileContextTracker"
@@ -70,6 +73,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	// Clean up orphaned file context warnings (startup cleanup)
 	await FileContextTracker.cleanupOrphanedWarnings(context)
+
+	// <letsboot fork>
+	// Apply state overrides from user settings.json (letsboot fork)
+	// This must be done after migrations but before creating the webview
+	await applyStateOverridesOnStartup(context)
+	// </letsboot fork>
 
 	// Version checking for autoupdate notification
 	const currentVersion = context.extension.packageJSON.version
