@@ -22,6 +22,10 @@ import BrowserSettingsSection from "./sections/BrowserSettingsSection"
 import DebugSection from "./sections/DebugSection"
 import { convertApiConfigurationToProtoApiConfiguration } from "@shared/proto-conversions/state/settings-conversion"
 import { convertChatSettingsToProtoChatSettings } from "@shared/proto-conversions/state/chat-settings-conversion"
+// <letsboot fork>
+import { UiServiceClient } from "@/services/grpc-client"
+import { EmptyRequest } from "@shared/proto/common"
+// </letsboot fork>
 
 const IS_DEV = process.env.IS_DEV
 
@@ -672,6 +676,16 @@ const SettingsView = ({ onDone, targetSection }: SettingsViewProps) => {
 		}
 	}, [])
 
+	// <letsboot fork> - Dump State to File functionality
+	const handleDumpStateToFile = async () => {
+		try {
+			await UiServiceClient.dumpStateToFile(EmptyRequest.create({}))
+		} catch (error) {
+			console.error("Error dumping state to file:", error)
+		}
+	}
+	// </letsboot fork>
+
 	return (
 		<Tab>
 			<TabHeader className="flex justify-between items-center gap-2">
@@ -679,6 +693,11 @@ const SettingsView = ({ onDone, targetSection }: SettingsViewProps) => {
 					<h3 className="text-[var(--vscode-foreground)] m-0">Settings</h3>
 				</div>
 				<div className="flex gap-2">
+					{/* letsboot fork */}
+					<VSCodeButton appearance="secondary" onClick={handleDumpStateToFile}>
+						Dump State to File
+					</VSCodeButton>
+					{/* /letsboot fork */}
 					<VSCodeButton appearance="secondary" onClick={handleCancel}>
 						Cancel
 					</VSCodeButton>

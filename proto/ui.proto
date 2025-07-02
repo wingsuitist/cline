@@ -268,4 +268,7 @@ service UiService {
   
   // Opens a URL in the default browser
   rpc openUrl(StringRequest) returns (Empty);
+  
+  // letsboot fork - Dumps the current extension state to a file in the workspace
+  rpc dumpStateToFile(EmptyRequest) returns (String);
 }
