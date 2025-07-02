@@ -22,7 +22,9 @@ export async function executeRipgrepForFiles(
 			"--follow",
 			"--hidden",
 			"-g",
-			"!**/{node_modules,.git,.github,out,dist,__pycache__,.venv,.env,venv,env,.cache,tmp,temp}/**",
+			// <letsboot fork> - removed ".github" from the exclusion list
+			"!**/{node_modules,.git,out,dist,__pycache__,.venv,.env,venv,env,.cache,tmp,temp}/**",
+			// </letsboot fork>
 			workspacePath,
 		]
 
