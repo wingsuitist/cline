@@ -8,6 +8,7 @@ This is a specific for for the Letsboot Labmachine project not intended to be pu
 - Removed `.github/` folder from file ignore list (`src/services/search/file-search.ts`).
 - Package as vsix in the fork project as cline-latest.vsix and the version from package.json (.github/workflows/letsboot-fork-package.yml).
 - Disable windows tests, as this fork isn't used or tested on Windows (.github/workflows/test.yml).
+- State overwrite system with bidirectional sync for nested properties.
 
 ## Install fork:
 
