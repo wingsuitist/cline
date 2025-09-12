@@ -1,3 +1,39 @@
+# Letsboot Labmachine specific Fork
+
+This is a specific for for the Letsboot Labmachine project not intended to be pulled upstream.
+
+- Overwrite any state using `cline.overwriteState` in the users `settings.json` to preconfigure the state of the extension.
+- Mark the extension to be a fork by extending placeholderText with "(letsboot fork v3.28)".
+- Button in the settings view to dump extension state into `.state.dump.json` in the workspace root. 
+- Removed `.github/` folder from file ignore list (`src/services/search/file-search.ts`).
+- Package as vsix in the fork project as cline-latest.vsix and the version from package.json (.github/workflows/letsboot-fork-package.yml).
+- Disable windows tests, as this fork isn't used or tested on Windows (.github/workflows/test.yml).
+
+## Install fork:
+
+```sh
+# Local VS Code
+curl -L -o /tmp/cline.vsix https://github.com/wingsuitist/cline/releases/download/latest/cline-latest.vsix
+code --force  --install-extension /tmp/cline.vsix
+rm /tmp/cline.vsix
+```
+
+```sh
+# Code Server
+curl -L -o /tmp/cline.vsix https://github.com/wingsuitist/cline/releases/download/latest/cline-latest.vsix
+code-server --force --install-extension /tmp/cline.vsix
+rm /tmp/cline.vsix
+```
+
+```sh
+# or use a specific version (example for v3.28)
+curl -L -o /tmp/cline.vsix https://github.com/wingsuitist/cline/releases/download/v3.28/cline-v3.28.vsix
+code-server --force --install-extension /tmp/cline.vsix
+rm /tmp/cline.vsix
+```
+
+---
+
 <div align="center"><sub>
 English | <a href="https://github.com/cline/cline/blob/main/locales/es/README.md" target="_blank">Español</a> | <a href="https://github.com/cline/cline/blob/main/locales/de/README.md" target="_blank">Deutsch</a> | <a href="https://github.com/cline/cline/blob/main/locales/ja/README.md" target="_blank">日本語</a> | <a href="https://github.com/cline/cline/blob/main/locales/zh-cn/README.md" target="_blank">简体中文</a> | <a href="https://github.com/cline/cline/blob/main/locales/zh-tw/README.md" target="_blank">繁體中文</a> | <a href="https://github.com/cline/cline/blob/main/locales/ko/README.md" target="_blank">한국어</a>
 </sub></div>

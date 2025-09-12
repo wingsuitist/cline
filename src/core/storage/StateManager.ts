@@ -1,10 +1,17 @@
 import { ApiConfiguration, fireworksDefaultModelId } from "@shared/api"
 import chokidar, { FSWatcher } from "chokidar"
 import type { ExtensionContext } from "vscode"
+// <letsboot fork>
+import {
+	storeSecretWithOverride,
+	updateGlobalStateWithOverride,
+	updateWorkspaceStateWithOverride,
+} from "../../storage/state-overwrite"
 import { getTaskHistoryStateFilePath, readTaskHistoryFromState, writeTaskHistoryToState } from "./disk"
 import { STATE_MANAGER_NOT_INITIALIZED } from "./error-messages"
 import { GlobalState, GlobalStateKey, LocalState, LocalStateKey, SecretKey, Secrets } from "./state-keys"
 import { readGlobalStateFromDisk, readSecretsFromDisk, readWorkspaceStateFromDisk } from "./utils/state-helpers"
+// </letsboot fork>
 
 export interface PersistenceErrorEvent {
 	error: Error
@@ -635,7 +642,10 @@ export class StateManager {
 						// Route task history persistence to file, not VS Code globalState
 						return writeTaskHistoryToState(this.context, this.globalStateCache[key])
 					}
-					return this.context.globalState.update(key, this.globalStateCache[key])
+					// <letsboot fork>
+					// Use override version to sync back to settings.json if needed
+					return updateGlobalStateWithOverride(this.context, key, this.globalStateCache[key])
+					// </letsboot fork>
 				}),
 			)
 		} catch (error) {
@@ -653,7 +663,10 @@ export class StateManager {
 				Array.from(keys).map((key) => {
 					const value = this.secretsCache[key]
 					if (value) {
-						return this.context.secrets.store(key, value)
+						// <letsboot fork>
+						// Use override version to sync back to settings.json if needed
+						return storeSecretWithOverride(this.context, key, value)
+						// </letsboot fork>
 					} else {
 						return this.context.secrets.delete(key)
 					}
@@ -673,7 +686,10 @@ export class StateManager {
 			await Promise.all(
 				Array.from(keys).map((key) => {
 					const value = this.workspaceStateCache[key]
-					return this.context.workspaceState.update(key, value)
+					// <letsboot fork>
+					// Use override version to sync back to settings.json if needed
+					return updateWorkspaceStateWithOverride(this.context, key, value)
+					// </letsboot fork>
 				}),
 			)
 		} catch (error) {

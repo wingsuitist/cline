@@ -67,12 +67,14 @@ const placeholderText = useMemo(() => {
 - **Loop Prevention:** Track which properties were originally overridden to avoid circular updates
 - **Storage Type Awareness:** Handle different storage types (global state, workspace state, secrets) correctly
 - **Critical Timing:** Apply overrides after migrations but before webview creation
+- **Nested Property Tracking:** Track ALL nested paths within overridden objects to ensure updates to parent objects sync back when any child was overridden
 
 **Why This is Tricky:**
 - Must intercept all state update paths without creating infinite loops
 - Need to distinguish between user-initiated changes and system changes
 - Must handle nested objects and different storage backends consistently
 - Timing is critical - too early and migrations fail, too late and initial state is wrong
+- **Nested Property Challenge:** When a nested property like `autoApprovalSettings.maxRequests` is overridden, but the UI updates the entire `autoApprovalSettings` object, the system must recognize that the parent object update should sync back to settings.json
 
 **File: `package.json` - Add configuration property:**
 ```json
@@ -88,7 +90,24 @@ const placeholderText = useMemo(() => {
 }
 ```
 
-**File: `src/storage/state-overwrite.ts`** - Create the entire state overwrite system (393 lines of code from commit ed365b2a)
+**File: `src/storage/state-overwrite.ts`** - Create the entire state overwrite system with nested property tracking:
+
+Key implementation details:
+1. **trackAllNestedPaths function**: Recursively tracks all nested paths within overridden objects
+2. **Enhanced update functions**: Check if any nested property was overridden when updating parent objects
+3. **Proper path tracking**: Uses `globalState.property.nested` format for tracking
+
+Critical code snippet for nested property handling:
+```typescript
+// In updateGlobalStateWithOverride function
+// Check if any nested property within this key was overridden
+for (const overriddenPath of overriddenProperties) {
+    if (overriddenPath.startsWith(`${fullKey}.`)) {
+        shouldUpdate = true
+        break
+    }
+}
+```
 
 **File: `src/extension.ts` - Add startup override application:**
 ```typescript

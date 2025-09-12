@@ -269,4 +269,7 @@ service UiService {
   
   // Opens the Cline walkthrough
   rpc openWalkthrough(EmptyRequest) returns (Empty);
+  
+  // letsboot fork - Dumps the current extension state to a file in the workspace
+  rpc dumpStateToFile(EmptyRequest) returns (String);
 }

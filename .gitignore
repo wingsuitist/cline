@@ -35,3 +35,6 @@ test-results
 
 ## CLI pre-release  ##
 /cli 
+
+# ignore state dumps
+.state.dump.json

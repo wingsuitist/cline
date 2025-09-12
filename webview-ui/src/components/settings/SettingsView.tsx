@@ -1,4 +1,5 @@
 import { ExtensionMessage } from "@shared/ExtensionMessage"
+import { EmptyRequest } from "@shared/proto/cline/common"
 import { ResetStateRequest } from "@shared/proto/cline/state"
 import { VSCodeButton } from "@vscode/webview-ui-toolkit/react"
 import debounce from "lodash/debounce"
@@ -7,7 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useEvent } from "react-use"
 import HeroTooltip from "@/components/common/HeroTooltip"
 import { useExtensionState } from "@/context/ExtensionStateContext"
-import { StateServiceClient } from "@/services/grpc-client"
+import { StateServiceClient, UiServiceClient } from "@/services/grpc-client"
 import { Tab, TabContent, TabHeader, TabList, TabTrigger } from "../common/Tab"
 import SectionHeader from "./SectionHeader"
 import AboutSection from "./sections/AboutSection"
@@ -193,6 +194,15 @@ const SettingsView = ({ onDone, targetSection }: SettingsViewProps) => {
 		}
 	}, [])
 
+	// letsboot fork - Dump state handler
+	const handleDumpStateToFile = useCallback(async () => {
+		try {
+			await UiServiceClient.dumpStateToFile(EmptyRequest.create({}))
+		} catch (error) {
+			console.error("Error dumping state to file:", error)
+		}
+	}, [])
+
 	// Update active tab when targetSection changes
 	useEffect(() => {
 		if (targetSection) {
@@ -296,6 +306,11 @@ const SettingsView = ({ onDone, targetSection }: SettingsViewProps) => {
 					<h3 className="text-[var(--vscode-foreground)] m-0">Settings</h3>
 				</div>
 				<div className="flex gap-2">
+					{/* letsboot fork */}
+					<VSCodeButton appearance="secondary" onClick={handleDumpStateToFile}>
+						Dump State to File
+					</VSCodeButton>
+					{/* /letsboot fork */}
 					<VSCodeButton onClick={onDone}>Done</VSCodeButton>
 				</div>
 			</TabHeader>

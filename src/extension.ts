@@ -40,7 +40,10 @@ import { AuthService } from "./services/auth/AuthService"
 import { telemetryService } from "./services/telemetry"
 import { SharedUriHandler } from "./services/uri/SharedUriHandler"
 import { ShowMessageType } from "./shared/proto/host/window"
+// <letsboot fork>
+import { applyStateOverridesOnStartup } from "./storage/state-overwrite"
 import { fileExistsAtPath } from "./utils/fs"
+// </letsboot fork>
 /*
 Built using https://github.com/microsoft/vscode-webview-ui-toolkit
 
@@ -56,6 +59,12 @@ export async function activate(context: vscode.ExtensionContext) {
 	setupHostProvider(context)
 
 	const sidebarWebview = (await initialize(context)) as VscodeWebviewProvider
+
+	// <letsboot fork>
+	// Apply state overrides from user settings.json (letsboot fork)
+	// This must be done after migrations but before creating the webview
+	await applyStateOverridesOnStartup(context)
+	// </letsboot fork>
 
 	Logger.log("Cline extension activated")
 

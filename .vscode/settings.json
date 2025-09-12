@@ -27,5 +27,8 @@
 		"source.removeUnused.biome": "always",
 		"source.removeUnusedImports": "always",
 		"source.organizeImports.biome": "always"
+	},
+	"[jsonc]": {
+		"editor.defaultFormatter": "vscode.json-language-features"
 	}
 }

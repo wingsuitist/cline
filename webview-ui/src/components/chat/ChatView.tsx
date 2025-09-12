@@ -327,7 +327,9 @@ const ChatView = ({ isHidden, showAnnouncement, hideAnnouncement, showHistoryVie
 	const scrollBehavior = useScrollBehavior(messages, visibleMessages, groupedMessages, expandedRows, setExpandedRows)
 
 	const placeholderText = useMemo(() => {
-		const text = task ? "Type a message..." : "Type your task here..."
+		// <letsboot fork>
+		const text = task ? "Type a message... (letsboot fork v3.28)" : "Type your task here... (letsboot fork v3.28)"
+		// </letsboot fork>
 		return text
 	}, [task])
 
