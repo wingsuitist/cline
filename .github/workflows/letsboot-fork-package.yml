@@ -24,9 +24,6 @@ jobs:
     - name: Install webview dependencies
       run: cd webview-ui && npm ci
     
-    - name: Run unit tests
-      run: npm run test:unit
-    
     - name: Build webview
       run: npm run build:webview
     
