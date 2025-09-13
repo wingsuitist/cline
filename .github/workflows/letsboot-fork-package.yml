@@ -24,9 +24,6 @@ jobs:
     - name: Install webview dependencies
       run: cd webview-ui && npm ci
     
-    - name: Build webview
-      run: npm run build:webview
-    
     - name: Package extension
       run: |
         npm install -g @vscode/vsce
