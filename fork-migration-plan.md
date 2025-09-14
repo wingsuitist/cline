@@ -10,6 +10,15 @@ This is a specific for for the Letsboot Labmachine project not intended to be pu
 - Package as vsix in the fork project as cline-latest.vsix and the version from package.json (.github/workflows/letsboot-fork-package.yml).
 - Disable windows tests, as this fork isn't used or tested on Windows (.github/workflows/test.yml).
 
+## 💡 Implementation Strategy: Learn First, Then Adapt
+
+**When implementing fork features:**
+1. **Start by examining the working implementation** from the previous fork version
+2. **Understand the core functionality and requirements** before making changes
+3. **Adapt as needed** for the new version's architecture and requirements
+4. **Preserve the functionality** while allowing for necessary improvements based on other changes or differences in the new version
+
+**This approach prevents reinventing working solutions while allowing for necessary evolution.**
 
 ## Goal:
 
@@ -208,6 +217,27 @@ const handleDumpStateToFile = async () => {
 
 **Goal:** Automated packaging and distribution of fork releases
 **Essence:** Independent release pipeline that doesn't interfere with upstream
+
+**Implementation Approach:**
+1. **Reference the working implementation:**
+   ```bash
+   git show v3.18.1:.github/workflows/letsboot-fork-package.yml
+   ```
+
+2. **Understand core requirements:**
+   - Test integration before packaging
+   - Dependency caching for performance
+   - Modern release management (avoid deprecated actions)
+   - Both latest and versioned releases
+   - Proper error handling
+   - Artifact uploads
+
+3. **Adapt for new version as needed:**
+   - Update Node.js version if required by new codebase
+   - Adjust build commands if package scripts changed
+   - Update action versions for security/compatibility
+   - Modify paths if project structure changed
+
 **Key Mechanics:**
 - **Automated Packaging:** Build VSIX on every main branch push
 - **Dual Versioning:** Create both "latest" and versioned releases
@@ -215,7 +245,9 @@ const handleDumpStateToFile = async () => {
 - **Test Integration:** Run tests before packaging
 - **Windows Exclusion:** Skip Windows tests since fork targets Linux/macOS environments
 
-**File: `.github/workflows/letsboot-fork-package.yml`** - Create entire packaging workflow (116 lines from commit ddb67677)
+**File: `.github/workflows/letsboot-fork-package.yml`** 
+- **Reference:** Working implementation from commit ddb67677 (~116 lines)
+- **Key features to preserve:** `gh` CLI usage, caching, test integration, error handling
 
 **File: `.github/workflows/test.yml` - Disable Windows tests:**
 ```yaml
