@@ -85,6 +85,14 @@ const placeholderText = useMemo(() => {
 - Timing is critical - too early and migrations fail, too late and initial state is wrong
 - **Nested Property Challenge:** When a nested property like `autoApprovalSettings.maxRequests` is overridden, but the UI updates the entire `autoApprovalSettings` object, the system must recognize that the parent object update should sync back to settings.json
 
+**⚠️ CRITICAL TIMING ISSUE - LEARNED FROM v3.28 MIGRATION:**
+- **Race Condition:** If `applyStateOverridesOnStartup()` is called AFTER `initialize()`, there's a race condition where the webview may receive initial state before overrides are applied
+- **Symptom:** WelcomeView shows on first startup despite `"welcomeViewCompleted": true` in overrides, but works correctly on reload
+- **Root Cause:** The webview subscribes to state updates and determines which view to show based on initial state, which may not include overrides yet
+- **Solution:** ALWAYS call `applyStateOverridesOnStartup(context)` BEFORE `initialize(context)` in `src/extension.ts`
+- **Correct Order:** `setupHostProvider()` → `applyStateOverridesOnStartup()` → `initialize()` → rest of activation
+- **Why This Matters:** On first startup, overrides must be in VSCode's state before any webview components read that state
+
 **File: `package.json` - Add configuration property:**
 ```json
 "configuration": {

@@ -58,13 +58,13 @@ https://github.com/microsoft/vscode-webview-ui-toolkit-samples/tree/main/framewo
 export async function activate(context: vscode.ExtensionContext) {
 	setupHostProvider(context)
 
-	const sidebarWebview = (await initialize(context)) as VscodeWebviewProvider
-
 	// <letsboot fork>
 	// Apply state overrides from user settings.json (letsboot fork)
-	// This must be done after migrations but before creating the webview
+	// This must be done before initializing webview components to prevent timing issues
 	await applyStateOverridesOnStartup(context)
 	// </letsboot fork>
+
+	const sidebarWebview = (await initialize(context)) as VscodeWebviewProvider
 
 	Logger.log("Cline extension activated")
 
