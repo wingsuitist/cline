@@ -1,8 +1,8 @@
 name: "Publish Nightly Release"
 
 on:
-  schedule:
-    - cron: '0 12 * * *'  # 4 AM PST (UTC-8) = 12 UTC
+  # schedule:
+  #   - cron: '0 12 * * *'  # 4 AM PST (UTC-8) = 12 UTC - DEACTIVATED
   workflow_dispatch:
 
 permissions:
