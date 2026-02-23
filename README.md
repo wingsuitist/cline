@@ -1,5 +1,7 @@
 # Letsboot Labmachine specific Fork
 
+**this fork is not longer needed as the features where implemented in cline upstream**
+
 This is a specific for for the Letsboot Labmachine project not intended to be pulled upstream.
 
 - Overwrite any state using `cline.overwriteState` in the users `settings.json` to preconfigure the state of the extension.
